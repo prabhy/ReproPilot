@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReproPilot — API Issue Investigator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg-main: #0f172a;
+    --bg-panel: #1e293b;
+    --bg-card: #334155;
+    --border: #475569;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --accent-hover: #0284c7;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --badge-simulated: #6366f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header {
+    background: #0b1120;
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+  .brand-badge {
+    background: var(--accent);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  .brand-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header-actions { display: flex; gap: 0.75rem; align-items: center; }
+  
+  .btn {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn-primary { background: var(--accent); color: #0b1120; }
+  .btn-primary:hover { background: var(--accent-hover); color: #fff; }
+  .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: #475569; }
+  .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
+  .btn-success { background: var(--success); color: #000; }
+
+  /* App Layout */
+  .main-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 48% 52%;
+    height: calc(100vh - 57px);
+    overflow: hidden;
+  }
+
+  /* Left Panel: Chat */
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    background: var(--bg-main);
+  }
+  .chat-header {
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .demo-shortcuts {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: #151f32;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--text-primary); }
+  .chip-primary { border-color: var(--accent); color: var(--accent); }
+
+  .chat-log {
+    flex: 1;
+    padding: 1.25rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .msg { display: flex; flex-direction: column; max-width: 90%; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.agent { align-self: flex-start; align-items: flex-start; }
+  .msg-bubble {
+    padding: 0.8rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .msg.user .msg-bubble {
+    background: var(--accent);
+    color: #0b1120;
+    font-weight: 500;
+  }
+  .msg.agent .msg-bubble {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+
+  .chat-input-bar {
+    padding: 0.85rem 1.25rem;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.6rem;
+  }
+  .chat-input-bar input {
+    flex: 1;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.65rem 0.9rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  .chat-input-bar input:focus { outline: none; border-color: var(--accent); }
+
+  /* Right Panel: Investigation Board */
+  .board-panel {
+    display: flex;
+    flex-direction: column;
+    background: #131d2f;
+    overflow-y: auto;
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 0.6rem;
+  }
+  .card-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .badge-sim { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #6366f1; }
+  .badge-401 { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid var(--danger); }
+  .badge-200 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--success); }
+
+  /* Evidence List */
+  .evidence-feed { display: flex; flex-direction: column; gap: 0.6rem; }
+  .evidence-item {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+  }
+  .evidence-top { display: flex; justify-content: space-between; align-items: center; }
+
+  /* Pre / Code Handoff */
+  pre.code-block {
+    background: #0a0f1d;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.45;
+  }
+
+  /* Two Column sub-grid */
+  .split-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .fact-list { list-style: square inside; font-size: 0.84rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.35rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-badge">PILOT</span>
+    <span class="brand-title">ReproPilot Investigation Center</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-primary btn-sm" id="btn-load-demo">⚡ Load Demo Issue</button>
+    <button class="btn btn-secondary btn-sm" id="btn-refresh-cases">↻ Refresh Board</button>
+  </div>
+</header>
+
+<div class="main-container">
+  <!-- LEFT: Chat & Actions -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Interactive Session (gemini-3.8-flash)</span>
+      <span id="session-badge" style="font-size:0.75rem; color:var(--accent);">Connected</span>
+    </div>
+    
+    <div class="demo-shortcuts">
+      <button class="chip chip-primary" id="chip-demo-1">1. Report Issue</button>
+      <button class="chip" id="chip-demo-2">2. Run 401 Diagnostic</button>
+      <button class="chip" id="chip-demo-3">3. Search KB Playbook</button>
+      <button class="chip chip-primary" id="chip-demo-4">4. Approve Token Retry (200)</button>
+      <button class="chip" id="chip-demo-5">5. Generate Handoff</button>
+    </div>
+
+    <div class="chat-log" id="chat-log">
+      <div class="msg agent">
+        <div class="msg-bubble">Hello! I am ReproPilot. I help turn API bug reports into evidence-backed investigations, reproducible test steps, and a clean engineering handoff.
+
+Click <b>"Load Demo Issue"</b> above or send a message below to start an investigation.</div>
+      </div>
+    </div>
+
+    <form class="chat-input-bar" id="chat-form">
+      <input type="text" id="chat-input" placeholder="Type instructions or paste bug details…" autocomplete="off">
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+  </div>
+
+  <!-- RIGHT: Investigation Board & Handoff -->
+  <div class="board-panel" id="board-panel">
+    <!-- Active Case Status Banner -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Active Case Context</div>
+        <span class="badge badge-sim" id="case-status-badge">INVESTIGATING</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:600; font-size:1rem;" id="case-title">CASE-2026-AUTH01: API Auth Failure post Password Reset</div>
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.2rem;" id="case-updated">Last update: Waiting for evidence…</div>
+        </div>
+        <span class="badge badge-sim">SIMULATED ENVIRONMENT</span>
+      </div>
+    </div>
+
+    <!-- Observed Evidence Feed -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Observed Evidence Log</div>
+        <span style="font-size:0.75rem; color:var(--text-secondary);" id="evidence-count">0 items</span>
+      </div>
+      <div class="evidence-feed" id="evidence-feed">
+        <div style="font-size:0.85rem; color:var(--text-secondary); font-style:italic;" id="evidence-empty">
+          No diagnostic evidence recorded yet. Trigger a diagnostic run to record response payloads.
+        </div>
+      </div>
+    </div>
+
+    <!-- Hypotheses vs Facts -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Facts vs. Hypotheses</div>
+      </div>
+      <div class="split-cols">
+        <div>
+          <div style="font-size:0.75rem; font-weight:700; color:var(--success); margin-bottom:0.4rem;">VERIFIED FACTS (OBSERVED)</div>
+          <ul class="fact-list" id="facts-list">
+            <li>User changed their account password.</li>
+            <li>API client reports calls stopped working.</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; font-weight:700; color:var(--warning); margin-bottom:0.4rem;">ACTIVE HYPOTHESES</div>
+          <ul class="fact-list" id="hypotheses-list">
+            <li>Bearer token invalidated upon password reset.</li>
+            <li>Client caching stale credentials.</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #334155; font-size:0.8rem;">
+        <span style="color:var(--accent); font-weight:600;">Next Recommended Check:</span>
+        <span id="next-check-text" style="color:var(--text-secondary); margin-left:0.3rem;">Run simulated diagnostic with demo-expired-token on /v1/orders</span>
+      </div>
+    </div>
+
+    <!-- Engineering Handoff -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Engineering Handoff (Copyable)</div>
+        <button class="btn btn-secondary btn-sm" id="btn-copy-handoff">📋 Copy Handoff</button>
+      </div>
+      <pre class="code-block" id="handoff-block">### Issue Summary
+API requests to `/v1/orders` fail with 401 Unauthorized following password change.
+
+### Reproduction Steps
+curl -X GET "https://api.internal.local/v1/orders" \
+  -H "Authorization: Bearer demo-expired-token"
+
+### Expected Result
+HTTP 200 OK with valid JSON resource.
+
+### Actual Result
+HTTP 401 Unauthorized (`ERR_AUTH_TOKEN_REVOKED`).
+
+### Diagnostic Evidence & Root Cause
+Evidence confirms password change triggered server-side token revocation (KB-AUTH-101). Reissuing test token (`demo-valid-token`) restores HTTP 200 OK.</pre>
+    </div>
+
+    <!-- Saved Cases Selector -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Saved Investigation Cases</div>
+      </div>
+      <div id="cases-list-container" style="display:flex; flex-direction:column; gap:0.4rem;">
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Loading cases…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const log = document.getElementById("chat-log");
+const form = document.getElementById("chat-form");
+const input = document.getElementById("chat-input");
+const evidenceFeed = document.getElementById("evidence-feed");
+const evidenceCount = document.getElementById("evidence-count");
+const evidenceEmpty = document.getElementById("evidence-empty");
+const handoffBlock = document.getElementById("handoff-block");
+const casesListContainer = document.getElementById("cases-list-container");
+
+function appendMsg(role, text) {
+  const m = document.createElement("div");
+  m.className = "msg " + role;
+  const b = document.createElement("div");
+  b.className = "msg-bubble";
+  b.textContent = text;
+  m.appendChild(b);
+  log.appendChild(m);
+  log.scrollTop = log.scrollHeight;
+  return b;
+}
+
+async function sendMessage(text) {
+  appendMsg("user", text);
+  const agentBubble = appendMsg("agent", "Analyzing…");
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    const reply = (data.parts && data.parts[0] && data.parts[0].text) || "No response";
+    agentBubble.textContent = reply;
+    log.scrollTop = log.scrollHeight;
+    
+    // Auto refresh board whenever agent responds
+    setTimeout(loadBoardData, 1200);
+  } catch (err) {
+    agentBubble.textContent = "Error: " + err.message;
+  }
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+  sendMessage(text);
+});
+
+// Demo Flow shortcuts
+document.getElementById("btn-load-demo").onclick = () => {
+  sendMessage("My integration stopped working after I changed my password.");
+};
+
+document.getElementById("chip-demo-1").onclick = () => {
+  sendMessage("My integration stopped working after I changed my password. The endpoint is /v1/orders.");
+};
+
+document.getElementById("chip-demo-2").onclick = () => {
+  sendMessage("Please run the simulated diagnostic tool for endpoint /v1/orders using the initial token 'demo-expired-token'.");
+};
+
+document.getElementById("chip-demo-3").onclick = () => {
+  sendMessage("Search the troubleshooting guide for credential changes and 401 token revocation.");
+};
+
+document.getElementById("chip-demo-4").onclick = () => {
+  sendMessage("I approve testing with the refreshed valid demo token 'demo-valid-token'. Please run the diagnostic retry now.");
+};
+
+document.getElementById("chip-demo-5").onclick = () => {
+  sendMessage("Please save this case (CASE-2026-AUTH01) with all observed evidence and generate the complete copyable engineering handoff.");
+};
+
+// Copy Handoff to Clipboard
+document.getElementById("btn-copy-handoff").onclick = () => {
+  navigator.clipboard.writeText(handoffBlock.textContent).then(() => {
+    const btn = document.getElementById("btn-copy-handoff");
+    btn.textContent = "✓ Copied!";
+    setTimeout(() => { btn.textContent = "📋 Copy Handoff"; }, 2000);
+  });
+};
+
+document.getElementById("btn-refresh-cases").onclick = () => {
+  loadBoardData();
+};
+
+// Fetch cases & evidence from backend
+async function loadBoardData() {
+  try {
+    const res = await fetch("/api/cases");
+    const data = await res.json();
+    const cases = data.cases || [];
+    
+    casesListContainer.innerHTML = "";
+    if (cases.length === 0) {
+      casesListContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-secondary);">No saved cases yet.</div>';
+    } else {
+      cases.forEach(c => {
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.justifyContent = "space-between";
+        row.style.alignItems = "center";
+        row.style.background = "#0f172a";
+        row.style.padding = "0.5rem 0.8rem";
+        row.style.borderRadius = "5px";
+        row.style.border = "1px solid #334155";
+        row.style.cursor = "pointer";
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:600; font-size:0.82rem;">${c.case_id} — ${c.title}</div>
+            <div style="font-size:0.74rem; color:var(--text-secondary);">Updated: ${new Date(c.updated_at).toLocaleTimeString()}</div>
+          </div>
+          <span class="badge ${c.status === 'Resolved' || c.status === 'Verified' ? 'badge-200' : 'badge-sim'}">${c.status}</span>
+        `;
+        row.onclick = () => loadSpecificCase(c.case_id);
+        casesListContainer.appendChild(row);
+      });
+      // Load most recent case
+      loadSpecificCase(cases[0].case_id);
+    }
+  } catch (e) {
+    console.error("Failed to load board data", e);
+  }
+}
+
+async function loadSpecificCase(caseId) {
+  try {
+    const res = await fetch(`/api/cases/${caseId}`);
+    if (!res.ok) return;
+    const c = await res.json();
+    
+    document.getElementById("case-title").textContent = `${c.case_id}: ${c.title}`;
+    document.getElementById("case-status-badge").textContent = c.status;
+    document.getElementById("case-status-badge").className = `badge ${c.status === 'Verified' || c.status === 'Resolved' ? 'badge-200' : 'badge-401'}`;
+    document.getElementById("case-updated").textContent = `Last update: ${new Date(c.updated_at).toLocaleTimeString()}`;
+    
+    if (c.next_check) {
+      document.getElementById("next-check-text").textContent = c.next_check;
+    }
+    if (c.handoff_notes) {
+      handoffBlock.textContent = c.handoff_notes;
+    }
+
+    if (c.hypotheses && c.hypotheses.length) {
+      const hList = document.getElementById("hypotheses-list");
+      hList.innerHTML = "";
+      c.hypotheses.forEach(h => {
+        const li = document.createElement("li");
+        li.textContent = h;
+        hList.appendChild(li);
+      });
+    }
+
+    if (c.evidence && c.evidence.length > 0) {
+      if (evidenceEmpty) evidenceEmpty.style.display = "none";
+      evidenceCount.textContent = `${c.evidence.length} items`;
+      evidenceFeed.innerHTML = "";
+      
+      const factsList = document.getElementById("facts-list");
+      factsList.innerHTML = "";
+
+      c.evidence.forEach(ev => {
+        const item = document.createElement("div");
+        item.className = "evidence-item";
+        const is200 = ev.status_code === 200;
+        item.innerHTML = `
+          <div class="evidence-top">
+            <span><span class="badge ${is200 ? 'badge-200' : 'badge-401'}">${ev.status_code || 401} ${ev.status_text || ''}</span> <b style="color:var(--text-primary); margin-left:0.4rem;">${ev.endpoint || '/v1/orders'}</b></span>
+            <span class="badge badge-sim">SIMULATED</span>
+          </div>
+          <div style="color:var(--text-secondary); font-size:0.75rem;">Token used: ${ev.token_used} (${ev.latency_ms || 35}ms)</div>
+          <div style="background:#000; padding:0.4rem; border-radius:4px; font-size:0.75rem; color:#a5f3fc; overflow-x:auto;">
+            ${JSON.stringify(ev.response_body || ev, null, 2)}
+          </div>
+        `;
+        evidenceFeed.appendChild(item);
+
+        const li = document.createElement("li");
+        li.textContent = `Endpoint ${ev.endpoint} returned ${ev.status_code} with token ${ev.token_used}`;
+        factsList.appendChild(li);
+      });
+    }
+  } catch (err) {
+    console.error("Error loading case", err);
+  }
+}
+
+// Initial load
+loadBoardData();
+</script>
+</body>
+</html>

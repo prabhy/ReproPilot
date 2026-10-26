@@ -1,0 +1,29 @@
+# Python & Virtual Environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+service_account.json
+
+# Local Development & Data Fallback
+data/cases/
+data/preferences/
+*.log
+
+# Caches & System
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+node_modules/
+dist/
+build/
+simple-agent/data/
