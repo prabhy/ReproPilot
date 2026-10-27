@@ -2,141 +2,225 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ReproPilot — Autonomous API Bug Investigator</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
   :root {
-    --bg-main: #0b1120;
-    --bg-panel: #131d31;
-    --bg-card: #1e293b;
-    --bg-subtle: #0f172a;
-    --border: #334155;
-    --border-light: #475569;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --accent: #38bdf8;
-    --accent-hover: #0284c7;
-    --danger: #ef4444;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --badge-sim: #6366f1;
-    --badge-kb: #a855f7;
+    --bg-base: #060b14;
+    --bg-surface: #0b1324;
+    --bg-surface-elevated: #111e38;
+    --bg-card: #142340;
+    --bg-card-subtle: #0d172b;
+    --border-subtle: #1e3052;
+    --border-medium: #2a436f;
+    --border-bright: #3b82f6;
+
+    --text-main: #f1f5f9;
+    --text-muted: #8fa0bd;
+    --text-dim: #5c6f8f;
+
+    /* Distinctive, intentional accent palette */
+    --accent-cyan: #06b6d4;
+    --accent-cyan-hover: #0891b2;
+    --accent-cyan-glow: rgba(6, 182, 212, 0.15);
+
+    --status-amber: #f59e0b;
+    --status-amber-bg: rgba(245, 158, 11, 0.12);
+    --status-amber-border: rgba(245, 158, 11, 0.4);
+
+    --status-red: #ef4444;
+    --status-red-bg: rgba(239, 68, 68, 0.12);
+    --status-red-border: rgba(239, 68, 68, 0.4);
+
+    --status-green: #10b981;
+    --status-green-bg: rgba(16, 185, 129, 0.12);
+    --status-green-border: rgba(16, 185, 129, 0.4);
+
+    --status-purple: #a855f7;
+    --status-purple-bg: rgba(168, 85, 247, 0.12);
+    --status-purple-border: rgba(168, 85, 247, 0.4);
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--bg-main);
-    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-main);
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
   }
-  
-  /* Top Nav */
+
+  /* TOP NAVIGATION */
   header {
-    background: #080d1a;
-    border-bottom: 1px solid var(--border);
-    padding: 0.6rem 1.25rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.65rem 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    z-index: 20;
   }
   .brand { display: flex; align-items: center; gap: 0.75rem; }
-  .brand-badge {
-    background: var(--accent);
-    color: #080d1a;
-    font-size: 0.72rem;
+  .brand-logo {
+    background: linear-gradient(135deg, var(--accent-cyan), #3b82f6);
+    color: #060b14;
+    font-size: 0.75rem;
     font-weight: 800;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
     letter-spacing: 0.05em;
   }
-  .brand-title { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.02em; }
-  .header-actions { display: flex; gap: 0.6rem; align-items: center; }
+  .brand-title { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; }
 
-  /* Buttons */
+  .header-actions { display: flex; align-items: center; gap: 0.6rem; }
+
+  /* BUTTONS */
   .btn {
     font-family: inherit;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
     padding: 0.45rem 0.85rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     border: none;
     transition: all 0.15s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    white-space: nowrap;
   }
-  .btn-primary { background: var(--accent); color: #080d1a; }
-  .btn-primary:hover { background: var(--accent-hover); color: #fff; }
-  .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: #334155; }
-  .btn-success { background: #059669; color: #fff; }
-  .btn-success:hover { background: #10b981; }
-  .btn-gh { background: #238636; color: #fff; }
-  .btn-gh:hover { background: #2ea043; }
-  .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
+  .btn-cyan {
+    background: var(--accent-cyan);
+    color: #060b14;
+  }
+  .btn-cyan:hover { background: var(--accent-cyan-hover); color: #fff; }
+  .btn-ghost {
+    background: var(--bg-surface-elevated);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+  }
+  .btn-ghost:hover { background: var(--bg-card); border-color: var(--border-medium); }
+  .btn-amber {
+    background: var(--status-amber-bg);
+    color: var(--status-amber);
+    border: 1px solid var(--status-amber-border);
+  }
+  .btn-green {
+    background: var(--status-green);
+    color: #fff;
+  }
+  .btn-green:hover { background: #059669; }
+  .btn-purple {
+    background: var(--status-purple-bg);
+    color: var(--status-purple);
+    border: 1px solid var(--status-purple-border);
+  }
 
-  /* Workflow Steps Bar */
-  .workflow-bar {
-    background: #0f172a;
-    border-bottom: 1px solid var(--border);
+  /* BADGES */
+  .badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .badge-amber { background: var(--status-amber-bg); color: var(--status-amber); border: 1px solid var(--status-amber-border); }
+  .badge-red { background: var(--status-red-bg); color: var(--status-red); border: 1px solid var(--status-red-border); }
+  .badge-green { background: var(--status-green-bg); color: var(--status-green); border: 1px solid var(--status-green-border); }
+  .badge-purple { background: var(--status-purple-bg); color: var(--status-purple); border: 1px solid var(--status-purple-border); }
+  .badge-cyan { background: var(--accent-cyan-glow); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.4); }
+
+  /* WORKFLOW STEP BAR */
+  .workflow-strip {
+    background: var(--bg-surface-elevated);
+    border-bottom: 1px solid var(--border-subtle);
     padding: 0.5rem 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    gap: 1rem;
+    overflow-x: auto;
   }
-  .steps-indicator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; }
-  .step-node {
+  .step-chips { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+  .step-chip {
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    color: var(--text-dim);
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    color: var(--text-secondary);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
+    transition: all 0.2s ease;
   }
-  .step-node.active { background: rgba(56, 189, 248, 0.15); color: var(--accent); font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.4); }
-  .step-node.done { color: var(--success); }
-  .step-arrow { color: #475569; font-size: 0.7rem; }
+  .step-chip.active {
+    background: var(--accent-cyan-glow);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.5);
+  }
+  .step-chip.done {
+    color: var(--status-green);
+  }
+  .step-sep { color: var(--border-medium); font-size: 0.7rem; }
 
-  /* Next Action Banner */
-  .next-action-container { display: flex; align-items: center; gap: 0.6rem; }
-  .next-action-label { font-size: 0.78rem; color: var(--text-secondary); }
+  /* NEXT ACTION BANNER */
+  .next-action-area {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+  }
+  .next-action-label {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
 
-  /* Main Container (50/50 responsive split, zero horizontal overflow) */
-  .main-container {
+  /* MAIN LAYOUT */
+  .workspace-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: minmax(0, 48%) minmax(0, 52%);
-    height: calc(100vh - 105px);
+    grid-template-columns: minmax(0, 46%) minmax(0, 54%);
+    height: calc(100vh - 106px);
     overflow: hidden;
   }
 
-  /* Left Panel: Chat */
-  .chat-panel {
+  /* LEFT: CHAT WORKSPACE */
+  .chat-view {
     display: flex;
     flex-direction: column;
     height: 100%;
     min-height: 0;
-    border-right: 1px solid var(--border);
-    background: #0b1120;
+    border-right: 1px solid var(--border-subtle);
+    background: var(--bg-base);
   }
   .chat-header {
-    padding: 0.6rem 1.25rem;
-    background: #111a2e;
-    border-bottom: 1px solid var(--border);
+    padding: 0.65rem 1.25rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
   }
-  .chat-log {
+  .chat-stream {
     flex: 1 1 0%;
     min-height: 0;
     padding: 1.25rem;
@@ -147,496 +231,646 @@
     gap: 1rem;
     scroll-behavior: smooth;
   }
-  .msg { display: flex; flex-direction: column; max-width: 92%; }
-  .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.agent { align-self: flex-start; align-items: flex-start; }
-  .msg-bubble {
-    padding: 0.8rem 1.1rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    line-height: 1.5;
+  .msg-row { display: flex; flex-direction: column; max-width: 90%; }
+  .msg-row.user { align-self: flex-end; align-items: flex-end; }
+  .msg-row.agent { align-self: flex-start; align-items: flex-start; }
+  .bubble {
+    padding: 0.8rem 1.05rem;
+    border-radius: var(--radius-md);
+    font-size: 0.88rem;
+    line-height: 1.52;
     white-space: pre-wrap;
     word-break: break-word;
   }
-  .msg.user .msg-bubble { background: var(--accent); color: #080d1a; font-weight: 500; }
-  .msg.agent .msg-bubble { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); }
+  .msg-row.user .bubble {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #fff;
+    font-weight: 500;
+    border-bottom-right-radius: 2px;
+  }
+  .msg-row.agent .bubble {
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    border-bottom-left-radius: 2px;
+  }
 
-  .chat-input-bar {
+  .chat-input-dock {
     padding: 0.75rem 1.25rem;
-    background: #111a2e;
-    border-top: 1px solid var(--border);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
     display: flex;
-    gap: 0.6rem;
+    gap: 0.65rem;
     flex-shrink: 0;
   }
-  .chat-input-bar input {
+  .chat-input-dock input {
     flex: 1;
-    background: var(--bg-main);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.65rem 0.9rem;
-    color: var(--text-primary);
+    background: var(--bg-base);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.95rem;
+    color: #fff;
     font-family: inherit;
     font-size: 0.88rem;
+    transition: border-color 0.15s;
   }
-  .chat-input-bar input:focus { outline: none; border-color: var(--accent); }
+  .chat-input-dock input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+  }
 
-  /* Right Panel: Investigation Board */
-  .board-panel {
+  /* RIGHT: INVESTIGATION BOARD */
+  .board-view {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: #0f172a;
+    min-height: 0;
+    background: var(--bg-surface);
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 1.1rem;
-    gap: 1.1rem;
+    padding: 1.25rem;
+    gap: 1.15rem;
   }
 
-  /* Cards */
   .card {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.8rem;
+    transition: border-color 0.2s ease;
   }
-  .card-header {
+  .card:hover { border-color: var(--border-medium); }
+
+  .card-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #1e293b;
-    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.55rem;
   }
-  .card-title {
-    font-size: 0.82rem;
+  .card-heading {
+    font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.4rem;
   }
-  
-  /* Badges */
-  .badge {
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .badge-sim { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #6366f1; }
-  .badge-kb { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
-  .badge-401 { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid var(--danger); }
-  .badge-200 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--success); }
-  .badge-inv { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid var(--warning); }
-  .badge-res { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--success); }
-  .badge-gcs { background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
 
-  /* Evidence Items */
-  .evidence-feed { display: flex; flex-direction: column; gap: 0.65rem; }
-  .evidence-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.85rem;
+  /* TIMELINE CONTAINER */
+  .timeline {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.85rem;
+    position: relative;
+    padding-left: 0.5rem;
   }
-  .evidence-header { display: flex; justify-content: space-between; align-items: center; }
-  .evidence-meta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.76rem; color: var(--text-secondary); }
-  .evidence-meta-item b { color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
-  .evidence-meaning { font-size: 0.82rem; color: #cbd5e1; line-height: 1.4; }
+  .timeline-item {
+    display: flex;
+    gap: 0.85rem;
+    position: relative;
+  }
+  .timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 22px;
+    flex-shrink: 0;
+  }
+  .marker-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-top: 3px;
+    border: 2px solid var(--bg-surface-elevated);
+  }
+  .marker-dot.red { background: var(--status-red); box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+  .marker-dot.purple { background: var(--status-purple); box-shadow: 0 0 8px rgba(168,85,247,0.5); }
+  .marker-dot.green { background: var(--status-green); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+  .marker-dot.amber { background: var(--status-amber); box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+  .marker-line {
+    flex: 1;
+    width: 2px;
+    background: var(--border-subtle);
+    margin-top: 4px;
+  }
 
-  /* Technical Details Accordion */
-  details.tech-details {
-    margin-top: 0.35rem;
-    background: #090e1a;
-    border: 1px solid #334155;
-    border-radius: 4px;
-    font-size: 0.78rem;
+  .timeline-content {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
   }
-  details.tech-details summary {
-    padding: 0.4rem 0.6rem;
+
+  .meta-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+  .meta-tag-list b {
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* DETAILS ACCORDION */
+  details.tech-expander {
+    margin-top: 0.35rem;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 0.76rem;
+  }
+  details.tech-expander summary {
+    padding: 0.45rem 0.65rem;
     cursor: pointer;
-    color: var(--accent);
+    color: var(--accent-cyan);
     font-weight: 600;
     user-select: none;
   }
-  details.tech-details summary:hover { color: #7dd3fc; }
-  pre.raw-json {
-    padding: 0.6rem;
-    margin: 0;
+  details.tech-expander summary:hover { color: #67e8f9; }
+  pre.code-json {
+    padding: 0.65rem;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.74rem;
-    color: #a5f3fc;
+    color: #99f6e4;
     overflow-x: auto;
-    border-top: 1px solid #1e293b;
-    max-height: 200px;
+    border-top: 1px solid var(--border-subtle);
+    max-height: 190px;
     white-space: pre-wrap;
+    background: #040812;
   }
 
-  /* Two Column Sub-grid for Facts vs Hypotheses */
-  .split-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .fact-box {
+  /* TWO COLUMN FACT VS HYPOTHESIS */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .analysis-box {
     background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.75rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .analysis-title {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .analysis-ul {
+    list-style: square inside;
+    font-size: 0.8rem;
+    color: #cbd5e1;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-  }
-  .fact-box-title { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-  .fact-list { list-style: square inside; font-size: 0.8rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.35rem; }
-
-  /* Code Handoff Box */
-  pre.code-block {
-    background: #090e1a;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.85rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
-    color: #cbd5e1;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    line-height: 1.45;
+    line-height: 1.4;
   }
 
-  /* Modal */
-  .modal-overlay {
+  /* EMPTY STATES */
+  .empty-state {
+    padding: 2.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.65rem;
+    background: var(--bg-card-subtle);
+    border: 1px dashed var(--border-medium);
+    border-radius: var(--radius-md);
+  }
+  .empty-icon { font-size: 1.8rem; opacity: 0.6; }
+  .empty-title { font-weight: 700; font-size: 0.92rem; color: #fff; }
+  .empty-desc { font-size: 0.8rem; color: var(--text-muted); max-width: 380px; line-height: 1.45; }
+
+  /* SIDEBAR / DRAWER FOR SAVED CASES */
+  .cases-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    max-width: 90vw;
+    height: 100vh;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border-subtle);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.6);
+    z-index: 100;
+    transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .cases-drawer.open { right: 0; }
+  .drawer-head {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-body {
+    flex: 1;
+    padding: 1.25rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  /* MODALS */
+  .modal-backdrop {
     display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 1000;
+    inset: 0;
+    background: rgba(4, 9, 20, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 200;
     align-items: center;
     justify-content: center;
   }
-  .modal-content {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+  .modal-pane {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
     width: 90%;
-    max-width: 650px;
+    max-width: 680px;
+    max-height: 85vh;
+    overflow-y: auto;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    max-height: 85vh;
-    overflow-y: auto;
+    gap: 1.1rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+
+  /* RESPONSIVE DESIGN */
+  @media (max-width: 900px) {
+    .workspace-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr;
+      height: calc(100vh - 110px);
+    }
+    .chat-view { border-right: none; border-bottom: 1px solid var(--border-subtle); }
+    .analysis-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
+<!-- TOP HEADER -->
 <header>
   <div class="brand">
-    <span class="brand-badge">REPROPILOT</span>
+    <span class="brand-logo">REPROPILOT</span>
     <span class="brand-title">API Bug Investigator</span>
   </div>
+
   <div class="header-actions">
-    <button class="btn btn-secondary btn-sm" id="btn-toggle-pref">⚙ Preference: <span id="pref-label">Balanced</span></button>
-    <button class="btn btn-secondary btn-sm" id="btn-refresh-board">↻ Refresh Board</button>
-    <button class="btn btn-success btn-sm" id="btn-confirm-resolve" style="display:none;">✓ Confirm Resolution</button>
+    <!-- Compact GCS Status Indicator with click details -->
+    <button class="btn btn-ghost" id="btn-gcs-details" title="Click to view GCS Bucket details">
+      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent-cyan); box-shadow:0 0 6px var(--accent-cyan);"></span>
+      <span style="font-size:0.76rem; font-family:'JetBrains Mono', monospace;" id="gcs-short-name">GCS: Active</span>
+    </button>
+
+    <button class="btn btn-ghost" id="btn-open-cases-drawer">📁 Saved Cases (<span id="saved-cases-count">0</span>)</button>
+    <button class="btn btn-ghost" id="btn-new-investigation">＋ New Case</button>
   </div>
 </header>
 
-<!-- Step Progress & Next Action -->
-<div class="workflow-bar">
-  <div class="steps-indicator">
-    <span class="step-node active" id="step-node-1">1. Describe Issue</span>
-    <span class="step-arrow">➔</span>
-    <span class="step-node" id="step-node-2">2. Review Diagnostic</span>
-    <span class="step-arrow">➔</span>
-    <span class="step-node" id="step-node-3">3. Review Next Check</span>
-    <span class="step-arrow">➔</span>
-    <span class="step-node" id="step-node-4">4. Approve Retry</span>
-    <span class="step-arrow">➔</span>
-    <span class="step-node" id="step-node-5">5. Save & Handoff</span>
+<!-- WORKFLOW STEP BAR -->
+<div class="workflow-strip">
+  <div class="step-chips">
+    <span class="step-chip active" id="chip-1">1. Describe</span>
+    <span class="step-sep">➔</span>
+    <span class="step-chip" id="chip-2">2. 401 Diagnostic</span>
+    <span class="step-sep">➔</span>
+    <span class="step-chip" id="chip-3">3. KB Search</span>
+    <span class="step-sep">➔</span>
+    <span class="step-chip" id="chip-4">4. 200 Retry</span>
+    <span class="step-sep">➔</span>
+    <span class="step-chip" id="chip-5">5. Handoff</span>
   </div>
-  <div class="next-action-container">
-    <span class="next-action-label">Suggested Next Step:</span>
-    <button class="btn btn-primary btn-sm" id="btn-main-next-action">⚡ Step 1: Load Sample Issue</button>
+
+  <div class="next-action-area">
+    <span class="next-action-label">Next Action:</span>
+    <button class="btn btn-cyan" id="btn-hero-action">⚡ Step 1: Load Sample Issue</button>
   </div>
 </div>
 
-<div class="main-container">
-  <!-- LEFT: Chat -->
-  <div class="chat-panel">
+<!-- WORKSPACE GRID (50/50 responsive split) -->
+<div class="workspace-grid">
+  <!-- LEFT: Interactive Chat -->
+  <section class="chat-view">
     <div class="chat-header">
-      <span style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Interactive Session (gemini-3.8-flash)</span>
-      <span id="session-badge" style="font-size:0.75rem; color:var(--accent);">Session: Init</span>
+      <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">Autonomous Agent Session (Gemini 3.8 Flash)</span>
+      <span id="session-tag" class="badge badge-cyan">Session: Ready</span>
     </div>
 
-    <div class="chat-log" id="chat-log">
-      <div class="msg agent">
-        <div class="msg-bubble">Welcome to ReproPilot. I investigate API bugs by capturing structured diagnostic evidence, matching troubleshooting playbooks, isolating failures through simulated retries, and producing engineering handoffs.
+    <div class="chat-stream" id="chat-stream">
+      <div class="msg-row agent">
+        <div class="bubble">Welcome to ReproPilot. I isolate API integration bugs, preserve real diagnostic traces, consult runbooks, and generate engineering handoffs.
 
-Follow the 5 workflow steps at the top or click the primary action button to get started.</div>
+Type any bug report below or click the primary action button above to start Step 1.</div>
       </div>
     </div>
 
-    <form class="chat-input-bar" id="chat-form">
-      <input type="text" id="chat-input" placeholder="Type instructions or paste error details…" autocomplete="off">
-      <button type="submit" class="btn btn-primary">Send</button>
+    <form class="chat-input-dock" id="chat-form">
+      <input type="text" id="chat-box" placeholder="Describe the API error or enter custom test parameters…" autocomplete="off">
+      <button type="submit" class="btn btn-cyan">Send</button>
     </form>
-  </div>
+  </section>
 
   <!-- RIGHT: Investigation Board -->
-  <div class="board-panel" id="board-panel">
+  <section class="board-view" id="board-view">
+    
     <!-- Active Case Status Banner -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Active Investigation Context</div>
-        <span class="badge badge-inv" id="case-status-badge">INVESTIGATING</span>
+    <div class="card" id="card-case-header">
+      <div class="card-top">
+        <div class="card-heading">Active Investigation Context</div>
+        <span class="badge badge-amber" id="case-status-badge">INVESTIGATING</span>
       </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
         <div>
-          <div style="font-weight:700; font-size:1.02rem;" id="case-title">CASE-2026-AUTH01: API Auth Failure post Password Reset</div>
-          <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.2rem;" id="case-updated">Status: Investigating (Pending Confirmation)</div>
+          <h2 style="font-size:1.05rem; font-weight:700; color:#fff;" id="case-display-title">CASE-2026-AUTH01: API Auth Failure post Password Reset</h2>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;" id="case-display-sub">Status: Investigating (Pending explicit user resolution)</p>
         </div>
-        <span class="badge badge-sim">SIMULATED ENVIRONMENT</span>
+        <span class="badge badge-purple" style="flex-shrink:0;">SIMULATED ENVIRONMENT</span>
       </div>
-      <div style="font-size:0.75rem; color:#94a3b8; background:rgba(0,0,0,0.3); padding:0.4rem 0.6rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
-        <span>☁️ <b>Storage:</b> <span id="storage-status-text">Cloud Storage: gs://repropilot-storage-qwiklabs-gcp-04-d32f9369da59/cases/{id}.json</span></span>
-        <span class="badge badge-gcs">GCS ACTIVE</span>
-      </div>
-      <div id="github-issue-banner" style="display:none; font-size:0.78rem; background:rgba(35, 134, 54, 0.2); border:1px solid #238636; padding:0.5rem; border-radius:4px;">
-        🐙 <b>GitHub Issue Linked:</b> <a id="github-issue-link" href="#" target="_blank" style="color:#58a6ff; font-weight:600; margin-left:0.3rem;">View on GitHub</a>
+
+      <!-- GitHub issue link indicator if created -->
+      <div id="case-gh-badge" style="display:none; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); border-radius:var(--radius-sm); padding:0.45rem 0.75rem; font-size:0.78rem; color:#6ee7b7;">
+        🐙 <b>Linked GitHub Issue:</b> <a id="case-gh-link" href="#" target="_blank" style="color:var(--accent-cyan); text-decoration:underline; margin-left:0.4rem;">View on GitHub</a>
       </div>
     </div>
 
-    <!-- Observed Evidence Feed -->
+    <!-- Timeline of Diagnostic Evidence -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">Observed Diagnostic Evidence</div>
-        <span style="font-size:0.75rem; color:var(--text-secondary);" id="evidence-count">0 items</span>
+      <div class="card-top">
+        <div class="card-heading">Diagnostic Evidence Timeline</div>
+        <span style="font-size:0.74rem; color:var(--text-muted);" id="evidence-summary-count">0 events recorded</span>
       </div>
-      <div class="evidence-feed" id="evidence-feed">
-        <div style="font-size:0.82rem; color:var(--text-secondary); font-style:italic;" id="evidence-empty">
-          No diagnostic evidence recorded yet. Trigger Step 1 or Step 2 to record diagnostic traces.
+
+      <div class="timeline" id="timeline-feed">
+        <!-- Rendered evidence timeline items go here -->
+        <div class="empty-state" id="evidence-empty-view">
+          <div class="empty-icon">🔬</div>
+          <div class="empty-title">No Diagnostic Evidence Captured Yet</div>
+          <div class="empty-desc">Run a simulated diagnostic or query the runbook to begin logging structured telemetry to this case.</div>
         </div>
       </div>
     </div>
 
-    <!-- Facts vs Hypotheses -->
+    <!-- What We Observed vs What Might Explain It -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">What We Observed vs. What Might Explain It</div>
+      <div class="card-top">
+        <div class="card-heading">What We Observed vs. What Might Explain It</div>
       </div>
-      <div class="split-cols">
-        <div class="fact-box">
-          <div class="fact-box-title" style="color:var(--success);">What We Observed (Facts)</div>
-          <ul class="fact-list" id="facts-list">
+
+      <div class="analysis-grid">
+        <div class="analysis-box">
+          <div class="analysis-title" style="color:var(--status-green);">What We Observed (Verified Facts)</div>
+          <ul class="analysis-ul" id="facts-ul">
             <li>User modified account password.</li>
-            <li>API client reported integration failure.</li>
+            <li>API integration reported failure on /v1/orders.</li>
           </ul>
         </div>
-        <div class="fact-box">
-          <div class="fact-box-title" style="color:var(--warning);">What Might Explain It (Hypotheses)</div>
-          <ul class="fact-list" id="hypotheses-list">
-            <li>Hypothesis: Credential change revoked previous active demo token.</li>
-            <li>Hypothesis: Client environment caching expired credentials.</li>
+        <div class="analysis-box">
+          <div class="analysis-title" style="color:var(--status-amber);">What Might Explain It (Hypotheses)</div>
+          <ul class="analysis-ul" id="hypotheses-ul">
+            <li>Hypothesis: Credential update invalidated active bearer token.</li>
+            <li>Hypothesis: Endpoint permissions or scopes modified.</li>
           </ul>
         </div>
       </div>
-      <div style="margin-top:0.4rem; padding-top:0.5rem; border-top:1px solid #1e293b; font-size:0.8rem;">
-        <span style="color:var(--accent); font-weight:600;">Recommended Next Check:</span>
-        <span id="next-check-text" style="color:var(--text-secondary); margin-left:0.3rem;">Execute diagnostic retry with valid demo token to isolate cause.</span>
+
+      <div style="padding-top:0.6rem; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
+        <div>
+          <span style="color:var(--accent-cyan); font-weight:700;">Suggested Next Check:</span>
+          <span id="next-check-label" style="color:var(--text-muted); margin-left:0.35rem;">Execute isolation retry with valid demo token.</span>
+        </div>
       </div>
     </div>
 
-    <!-- Engineering Handoff -->
+    <!-- Engineering Handoff Summary & Drawer / Modal Trigger -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">Copyable Engineering Handoff</div>
+      <div class="card-top">
+        <div class="card-heading">Engineering Handoff Summary</div>
         <div style="display:flex; gap:0.5rem;">
-          <button class="btn btn-secondary btn-sm" id="btn-copy-handoff">📋 Copy Handoff</button>
-          <button class="btn btn-gh btn-sm" id="btn-open-issue-modal">🐙 Create GitHub Issue</button>
+          <button class="btn btn-ghost" id="btn-preview-handoff">📄 View Full Handoff</button>
+          <button class="btn btn-cyan" id="btn-create-gh-issue">🐙 Create GitHub Issue</button>
         </div>
       </div>
-      <pre class="code-block" id="handoff-block">### Issue Summary
-API requests to `/v1/orders` return 401 Unauthorized ("Demo token rejected.") after password change.
 
-### Reproduction Steps
-curl -X GET "https://api.internal.local/v1/orders" \
-  -H "Authorization: Bearer demo-expired-token"
-
-### Expected Result
-HTTP 200 OK with resource representation.
-
-### Actual Result
-HTTP 401 Unauthorized (Response: {"error": "unauthorized", "message": "Demo token rejected."}).
-
-### Diagnostic Evidence & Hypothesis
-Observed fact: demo-expired-token returned 401. A 401 alone does not prove password revocation.
-Subsequent test with demo-valid-token returned 200 OK.
-Hypothesis: Password update invalidated prior active token credentials per KB-AUTH-101 playbook.</pre>
+      <p style="font-size:0.82rem; color:#cbd5e1; line-height:1.45;" id="handoff-preview-text">
+        Reproduction steps and diagnostic isolation traces ready. Token rejection on <code>demo-expired-token</code> confirmed; isolation verification via <code>demo-valid-token</code> successful.
+      </p>
     </div>
 
-    <!-- Saved Cases (Cloud Storage) -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Saved Investigation Cases (Cloud Storage)</div>
+  </section>
+</div>
+
+<!-- SIDEBAR DRAWER: SAVED CASES -->
+<aside class="cases-drawer" id="cases-drawer">
+  <div class="drawer-head">
+    <h3 style="font-size:0.95rem; font-weight:700; color:#fff;">📁 Saved Cloud Cases</h3>
+    <button class="btn btn-ghost" id="btn-close-drawer">✕</button>
+  </div>
+  <div style="padding:0.75rem 1.25rem; border-bottom:1px solid var(--border-subtle);">
+    <input type="text" id="case-search-box" placeholder="Search case ID or summary…" style="width:100%; background:var(--bg-base); border:1px solid var(--border-subtle); padding:0.45rem 0.75rem; border-radius:4px; color:#fff; font-size:0.8rem;">
+  </div>
+  <div class="drawer-body" id="drawer-cases-list">
+    <!-- Populated by cases loaded from GCS -->
+  </div>
+</aside>
+
+<!-- MODAL: GCS BUCKET DETAILS -->
+<div class="modal-backdrop" id="modal-gcs">
+  <div class="modal-pane">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-size:1.05rem; font-weight:700; color:#fff;">☁️ Google Cloud Storage Bucket Status</h3>
+      <button class="btn btn-ghost" id="btn-close-gcs-modal">✕</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.82rem;">
+      <div style="background:var(--bg-card); padding:0.75rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+        <p><b>Bucket Name:</b> <span style="color:var(--accent-cyan); font-family:'JetBrains Mono';" id="gcs-modal-bucket">Loading…</span></p>
+        <p style="margin-top:0.3rem;"><b>Project ID:</b> <span style="font-family:'JetBrains Mono';" id="gcs-modal-proj">Loading…</span></p>
+        <p style="margin-top:0.3rem;"><b>Object Key Scheme:</b> <span style="font-family:'JetBrains Mono';">cases/{case_id}.json</span></p>
+        <p style="margin-top:0.3rem;"><b>Access Control:</b> Uniform Bucket-Level Access (Enforced private)</p>
       </div>
-      <div id="cases-list-container" style="display:flex; flex-direction:column; gap:0.4rem;">
-        <div style="font-size:0.8rem; color:var(--text-secondary);">Loading cases from Cloud Storage…</div>
-      </div>
+      <p style="color:var(--status-amber); font-size:0.78rem;">ℹ️ Note: Qwiklabs workshop GCP buckets are temporary sandboxes that are automatically deleted when the lab session finishes.</p>
     </div>
   </div>
 </div>
 
-<!-- Modal for GitHub Issue Preview & Confirmation -->
-<div class="modal-overlay" id="issue-modal">
-  <div class="modal-content">
+<!-- MODAL: FULL ENGINEERING HANDOFF PREVIEW -->
+<div class="modal-backdrop" id="modal-handoff">
+  <div class="modal-pane">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 style="font-size:1.05rem;">🐙 Preview & Confirm GitHub Issue</h3>
-      <button class="btn btn-secondary btn-sm" id="btn-close-modal">✕</button>
+      <h3 style="font-size:1.05rem; font-weight:700; color:#fff;">📋 Engineering Handoff Document</h3>
+      <button class="btn btn-ghost" id="btn-close-handoff-modal">✕</button>
     </div>
-    
-    <div style="font-size:0.82rem; color:var(--text-secondary);">
-      Preview the issue title and engineering handoff before creation. Evidence is clearly labeled as simulated.
+
+    <pre id="modal-handoff-code" style="background:#040812; border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:1rem; font-family:'JetBrains Mono'; font-size:0.78rem; color:#99f6e4; overflow-x:auto; white-space:pre-wrap; max-height:55vh;"></pre>
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn btn-ghost" id="btn-modal-copy">📋 Copy Handoff</button>
+      <button class="btn btn-green" id="btn-modal-resolve">✓ Mark Case Resolved</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GITHUB ISSUE CREATION -->
+<div class="modal-backdrop" id="modal-issue">
+  <div class="modal-pane">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-size:1.05rem; font-weight:700; color:#fff;">🐙 Create GitHub Issue (prabhy/ReproPilot)</h3>
+      <button class="btn btn-ghost" id="btn-close-issue-modal">✕</button>
+    </div>
+
+    <p style="font-size:0.8rem; color:var(--text-muted);">Preview the handoff before submitting to your repository. Evidence is clearly tagged as simulated.</p>
+
+    <div style="display:flex; flex-direction:column; gap:0.4rem;">
+      <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">Issue Title</label>
+      <input type="text" id="input-issue-title" style="background:var(--bg-base); border:1px solid var(--border-medium); border-radius:4px; padding:0.5rem; color:#fff; font-size:0.84rem;">
     </div>
 
     <div style="display:flex; flex-direction:column; gap:0.4rem;">
-      <label style="font-size:0.8rem; font-weight:600; color:#94a3b8;">Issue Title</label>
-      <input type="text" id="modal-issue-title" style="background:#0b1120; border:1px solid #475569; padding:0.5rem; border-radius:4px; color:#fff; font-family:inherit;">
+      <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">Issue Body (Markdown)</label>
+      <textarea id="input-issue-body" rows="9" style="background:var(--bg-base); border:1px solid var(--border-medium); border-radius:4px; padding:0.5rem; color:#cbd5e1; font-family:'JetBrains Mono'; font-size:0.76rem;"></textarea>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:0.4rem;">
-      <label style="font-size:0.8rem; font-weight:600; color:#94a3b8;">Issue Body (Markdown)</label>
-      <textarea id="modal-issue-body" rows="10" style="background:#0b1120; border:1px solid #475569; padding:0.5rem; border-radius:4px; color:#cbd5e1; font-family:'JetBrains Mono', monospace; font-size:0.8rem; line-height:1.4; resize:vertical;"></textarea>
-    </div>
+    <div id="issue-status-msg" style="font-size:0.8rem; display:none;"></div>
 
-    <div id="modal-status-msg" style="font-size:0.82rem; color:var(--warning); display:none;"></div>
-
-    <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:0.5rem;">
-      <button class="btn btn-secondary" id="btn-cancel-modal">Cancel</button>
-      <button class="btn btn-gh" id="btn-confirm-create-issue">✓ Confirm & Create Issue</button>
+    <div style="display:flex; justify-content:flex-end; gap:0.6rem;">
+      <button class="btn btn-ghost" id="btn-cancel-issue">Cancel</button>
+      <button class="btn btn-cyan" id="btn-confirm-submit-issue">✓ Confirm & Create Issue</button>
     </div>
   </div>
 </div>
 
 <script>
-const log = document.getElementById("chat-log");
-const form = document.getElementById("chat-form");
-const input = document.getElementById("chat-input");
-const evidenceFeed = document.getElementById("evidence-feed");
-const evidenceCount = document.getElementById("evidence-count");
-const evidenceEmpty = document.getElementById("evidence-empty");
-const handoffBlock = document.getElementById("handoff-block");
-const casesListContainer = document.getElementById("cases-list-container");
-const sessionBadge = document.getElementById("session-badge");
-const prefLabel = document.getElementById("pref-label");
-const btnMainNextAction = document.getElementById("btn-main-next-action");
-const btnConfirmResolve = document.getElementById("btn-confirm-resolve");
-
+// State Management
 let currentCaseId = "CASE-2026-AUTH01";
 let currentSessionId = localStorage.getItem("repropilot_session_id") || "sess_" + Date.now();
 const userId = "pilot_dev";
+let activeStep = 1;
+let allSavedCases = [];
 
-// Step progression state: 1 to 5
-let currentWorkflowStep = 1;
+// Elements
+const chatStream = document.getElementById("chat-stream");
+const chatForm = document.getElementById("chat-form");
+const chatBox = document.getElementById("chat-box");
+const btnHeroAction = document.getElementById("btn-hero-action");
+const timelineFeed = document.getElementById("timeline-feed");
+const evidenceEmptyView = document.getElementById("evidence-empty-view");
+const factsUl = document.getElementById("facts-ul");
+const hypothesesUl = document.getElementById("hypotheses-ul");
+const nextCheckLabel = document.getElementById("next-check-label");
+const handoffPreviewText = document.getElementById("handoff-preview-text");
+const sessionTag = document.getElementById("session-tag");
 
-function updateWorkflowStep(step) {
-  currentWorkflowStep = step;
+// Step Progress Coordinator
+function setStep(step) {
+  activeStep = step;
   for (let i = 1; i <= 5; i++) {
-    const node = document.getElementById(`step-node-${i}`);
-    if (i < step) {
-      node.className = "step-node done";
-    } else if (i === step) {
-      node.className = "step-node active";
-    } else {
-      node.className = "step-node";
-    }
+    const chip = document.getElementById(`chip-${i}`);
+    if (i < step) chip.className = "step-chip done";
+    else if (i === step) chip.className = "step-chip active";
+    else chip.className = "step-chip";
   }
 
-  // Update prominent next button
   switch(step) {
     case 1:
-      btnMainNextAction.textContent = "⚡ Step 1: Load Sample Issue";
-      btnMainNextAction.onclick = () => {
-        sendMessage("My integration stopped working after I changed my password. The endpoint is /v1/orders.");
-        updateWorkflowStep(2);
+      btnHeroAction.textContent = "⚡ Step 1: Load Sample Issue";
+      btnHeroAction.onclick = () => {
+        sendChat("My integration stopped working after I changed my password. The endpoint is /v1/orders.");
+        setStep(2);
       };
       break;
     case 2:
-      btnMainNextAction.textContent = "🔍 Step 2: Run 401 Diagnostic";
-      btnMainNextAction.onclick = () => {
-        sendMessage("Please run the simulated diagnostic tool for endpoint /v1/orders using the initial token 'demo-expired-token'.");
-        updateWorkflowStep(3);
+      btnHeroAction.textContent = "🔍 Step 2: Run 401 Diagnostic";
+      btnHeroAction.onclick = () => {
+        sendChat("Please run the simulated diagnostic tool for endpoint /v1/orders using the initial token 'demo-expired-token'.");
+        setStep(3);
       };
       break;
     case 3:
-      btnMainNextAction.textContent = "📖 Step 3: Review Next Check & Runbook";
-      btnMainNextAction.onclick = () => {
-        sendMessage("Search the troubleshooting guide for credential changes and 401 token revocation.");
-        updateWorkflowStep(4);
+      btnHeroAction.textContent = "📖 Step 3: Search KB Playbook";
+      btnHeroAction.onclick = () => {
+        sendChat("Search the troubleshooting guide for credential changes and 401 token revocation.");
+        setStep(4);
       };
       break;
     case 4:
-      btnMainNextAction.textContent = "⚡ Step 4: Approve Retry with Valid Demo Token";
-      btnMainNextAction.onclick = () => {
-        sendMessage("I approve: Retry with valid demo token ('demo-valid-token'). Please run the diagnostic retry now.");
-        updateWorkflowStep(5);
+      btnHeroAction.textContent = "⚡ Step 4: Approve Retry with Valid Token";
+      btnHeroAction.onclick = () => {
+        sendChat("I approve: Retry with valid demo token ('demo-valid-token'). Please run the diagnostic retry now.");
+        setStep(5);
       };
       break;
     case 5:
-      btnMainNextAction.textContent = "💾 Step 5: Save Case & Handoff";
-      btnMainNextAction.onclick = () => {
-        sendMessage("Please save this case (CASE-2026-AUTH01) to Cloud Storage with all observed evidence and generate the complete copyable engineering handoff.");
-        btnConfirmResolve.style.display = "inline-flex";
+      btnHeroAction.textContent = "💾 Step 5: Save Case & Handoff";
+      btnHeroAction.onclick = () => {
+        sendChat("Please save this case (CASE-2026-AUTH01) to Cloud Storage with all observed evidence and generate the complete copyable engineering handoff.");
       };
       break;
   }
 }
 
-function scrollChatToBottom() {
+// Smooth scroll chat
+function scrollChat() {
   requestAnimationFrame(() => {
-    log.scrollTop = log.scrollHeight;
+    chatStream.scrollTop = chatStream.scrollHeight;
   });
 }
 
-function appendMsg(role, text) {
-  const m = document.createElement("div");
-  m.className = "msg " + role;
-  const b = document.createElement("div");
-  b.className = "msg-bubble";
-  b.textContent = text;
-  m.appendChild(b);
-  log.appendChild(m);
-  scrollChatToBottom();
-  return b;
+function appendMessage(role, text) {
+  const row = document.createElement("div");
+  row.className = "msg-row " + role;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  chatStream.appendChild(row);
+  scrollChat();
+  return bubble;
 }
 
-async function sendMessage(text) {
-  appendMsg("user", text);
-  const agentBubble = appendMsg("agent", "Analyzing…");
+// Chat API invocation
+async function sendChat(text) {
+  appendMessage("user", text);
+  const agentBubble = appendMessage("agent", "Investigating…");
 
   try {
-    const payload = {
-      message: text,
-      user_id: userId,
-      session_id: currentSessionId
-    };
-
     const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        message: text,
+        user_id: userId,
+        session_id: currentSessionId
+      })
     });
 
     if (!res.ok) {
-      const errText = await res.text();
-      agentBubble.textContent = "Error (" + res.status + "): " + errText;
-      scrollChatToBottom();
+      const err = await res.text();
+      agentBubble.textContent = "Request error (" + res.status + "): " + err;
       return;
     }
 
@@ -644,413 +878,333 @@ async function sendMessage(text) {
     if (data.session_id) {
       currentSessionId = data.session_id;
       localStorage.setItem("repropilot_session_id", currentSessionId);
-      sessionBadge.textContent = "Session: " + currentSessionId.slice(0, 8) + "…";
+      sessionTag.textContent = "Session: " + currentSessionId.slice(0, 8);
     }
 
-    if (data.reply) {
-      agentBubble.textContent = data.reply;
-    } else if (data.error) {
-      agentBubble.textContent = "Error: " + data.error;
-    } else {
-      agentBubble.textContent = "Response received: " + JSON.stringify(data);
-    }
-    scrollChatToBottom();
+    agentBubble.textContent = data.reply || "Diagnostic completed.";
+    scrollChat();
 
-    setTimeout(loadBoardData, 1000);
+    // Reload case data from Cloud Storage
+    setTimeout(loadCaseDetails, 800);
   } catch (err) {
-    agentBubble.textContent = "Network/Request Error: " + err.message;
-    scrollChatToBottom();
+    agentBubble.textContent = "Network Error: " + err.message;
   }
 }
 
-form.addEventListener("submit", (e) => {
+chatForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = "";
-  sendMessage(text);
+  const q = chatBox.value.trim();
+  if (!q) return;
+  chatBox.value = "";
+  sendChat(q);
 });
 
-// Explicit user confirmation to resolve
-btnConfirmResolve.onclick = async () => {
-  if (confirm("Confirm marking this investigation as RESOLVED?")) {
-    sendMessage("I have verified the engineering handoff and confirm marking this case as RESOLVED.");
-    btnConfirmResolve.style.display = "none";
-  }
-};
-
-// Toggle preference
-document.getElementById("btn-toggle-pref").onclick = async () => {
-  const current = prefLabel.textContent.toLowerCase();
-  const next = current === "concise" ? "detailed" : "concise";
-  await fetch(`/api/preferences/${userId}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ detail_level: next })
-  });
-  prefLabel.textContent = next.charAt(0).toUpperCase() + next.slice(1);
-  sendMessage(`Please note my preferred explanation detail level is now: ${next}.`);
-};
-
-// Copy Handoff to Clipboard
-document.getElementById("btn-copy-handoff").onclick = () => {
-  navigator.clipboard.writeText(handoffBlock.textContent).then(() => {
-    const btn = document.getElementById("btn-copy-handoff");
-    btn.textContent = "✓ Copied!";
-    setTimeout(() => { btn.textContent = "📋 Copy Handoff"; }, 2000);
-  });
-};
-
-document.getElementById("btn-refresh-board").onclick = () => {
-  loadBoardData();
-};
-
-// Robust extractor for diagnostic values
-function parseDiagnosticEvidence(ev) {
-  const d = ev.data || ev.details || {};
-  
-  // Status code
-  let statusCode = ev.status_code || d.status_code;
-  if (!statusCode) {
-    if (ev.type && ev.type.includes("success")) statusCode = 200;
-    else if (d.token && d.token.includes("valid")) statusCode = 200;
-    else if (d.token_used && d.token_used.includes("valid")) statusCode = 200;
-    else statusCode = 401;
-  }
-
-  // Token label
-  let tokenUsed = ev.token_used || d.token_used || ev.token || d.token;
-  if (!tokenUsed) {
-    if (statusCode === 200) tokenUsed = "demo-valid-token";
-    else tokenUsed = "demo-expired-token";
-  }
-
-  // Status text
-  let statusText = ev.status_text || d.status_text;
-  if (!statusText) {
-    statusText = (statusCode === 200) ? "OK" : "Unauthorized";
-  }
-
-  // Endpoint
-  let endpoint = ev.endpoint || d.endpoint || "/v1/orders";
-
-  // Request ID
-  let reqId = ev.request_id || d.request_id;
-  const headers = ev.response_headers || d.response_headers || {};
-  if (!reqId && headers["x-request-id"]) reqId = headers["x-request-id"];
-  if (!reqId) reqId = (statusCode === 200) ? "req-sim-200-5542" : "req-sim-401-9871";
-
-  // Timestamp
-  let timestamp = ev.timestamp || d.timestamp || new Date().toISOString();
-
-  // Full response body
-  let responseBody = ev.response_body || d.response_body;
-  if (!responseBody || Object.keys(responseBody).length === 0) {
-    if (statusCode === 200) {
-      responseBody = {
-        status: "success",
-        account_id: d.account_id || "acc_enterprise_8829",
-        organization: d.organization || "Acme Global Corp",
-        scopes: ["orders:read", "orders:write"],
-        token_type: "Bearer",
-        expires_in: 3600
-      };
-    } else {
-      responseBody = {
-        error: d.error || "unauthorized",
-        message: d.message || "Demo token rejected.",
-        code: d.code || "ERR_DEMO_TOKEN_REJECTED"
-      };
-    }
-  }
-
-  // Plain-English meaning
-  let meaning = "";
-  if (statusCode === 200) {
-    meaning = "Valid demo token succeeded. The API endpoint and order scopes are operational when credentials are active.";
-  } else if (statusCode === 401) {
-    meaning = "Demo token was rejected by the API (\"Demo token rejected.\"). Confirms the token is unrecognized or revoked.";
-  } else {
-    meaning = `Endpoint returned HTTP status ${statusCode}.`;
-  }
-
-  return {
-    statusCode,
-    statusText,
-    endpoint,
-    tokenUsed,
-    reqId,
-    timestamp,
-    responseBody,
-    headers,
-    meaning
-  };
-}
-
-function isKnowledgeEvidence(ev) {
-  if (ev.type && (ev.type.includes("knowledge") || ev.type.includes("runbook") || ev.type.includes("guide"))) return true;
-  if (ev.article_id || (ev.data && ev.data.article_id) || (ev.details && ev.details.article_id)) return true;
-  if (ev.source && ev.source.includes("guide")) return true;
-  if (ev.title && (ev.summary || ev.category) && !ev.status_code && (!ev.data || !ev.data.status_code)) return true;
-  return false;
-}
-
-// Fetch cases & evidence from backend
-async function loadBoardData() {
-  try {
-    const res = await fetch("/api/cases");
-    const data = await res.json();
-    const cases = data.cases || [];
-    
-    casesListContainer.innerHTML = "";
-    if (cases.length === 0) {
-      casesListContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-secondary);">No saved cases in Cloud Storage yet.</div>';
-    } else {
-      cases.forEach(c => {
-        const row = document.createElement("div");
-        row.style.display = "flex";
-        row.style.justifyContent = "space-between";
-        row.style.alignItems = "center";
-        row.style.background = "#0b1120";
-        row.style.padding = "0.5rem 0.8rem";
-        row.style.borderRadius = "5px";
-        row.style.border = "1px solid #334155";
-        row.style.cursor = "pointer";
-        const isRes = c.status.toLowerCase() === 'resolved';
-        const badgeCls = isRes ? 'badge-res' : 'badge-inv';
-        row.innerHTML = `
-          <div>
-            <div style="font-weight:600; font-size:0.82rem;">${c.case_id} — ${c.title}</div>
-            <div style="font-size:0.74rem; color:var(--text-secondary);">${c.github_issue_url ? '🐙 Issue linked • ' : ''}Updated: ${c.updated_at ? new Date(c.updated_at).toLocaleTimeString() : 'Recent'}</div>
-          </div>
-          <span class="badge ${badgeCls}">${c.status}</span>
-        `;
-        row.onclick = () => loadSpecificCase(c.case_id);
-        casesListContainer.appendChild(row);
-      });
-      loadSpecificCase(currentCaseId || cases[0].case_id);
-    }
-  } catch (e) {
-    console.error("Failed to load board data", e);
-  }
-}
-
-async function loadSpecificCase(caseId) {
+// Load Specific Case from GCS
+async function loadCaseDetails(caseId = currentCaseId) {
   try {
     currentCaseId = caseId;
     const res = await fetch(`/api/cases/${caseId}`);
     if (!res.ok) return;
     const c = await res.json();
-    
-    let displayTitle = c.title || "API Auth Failure post Password Reset";
-    document.getElementById("case-title").textContent = `${c.case_id}: ${displayTitle}`;
-    
-    const statusText = c.status || "Investigating";
-    const isResolved = statusText.toLowerCase() === 'resolved';
-    document.getElementById("case-status-badge").textContent = statusText.toUpperCase();
-    document.getElementById("case-status-badge").className = `badge ${isResolved ? 'badge-res' : 'badge-inv'}`;
-    document.getElementById("case-updated").textContent = `Status: ${statusText} (${c.updated_at ? new Date(c.updated_at).toLocaleTimeString() : 'Recent'})`;
-    
-    // GitHub Issue Link
-    const ghBanner = document.getElementById("github-issue-banner");
-    const ghLink = document.getElementById("github-issue-link");
+
+    document.getElementById("case-display-title").textContent = `${c.case_id}: ${c.title || 'API Auth Failure'}`;
+    const status = c.status || "Investigating";
+    const badge = document.getElementById("case-status-badge");
+    badge.textContent = status.toUpperCase();
+    badge.className = status.toLowerCase() === 'resolved' ? 'badge badge-green' : 'badge badge-amber';
+    document.getElementById("case-display-sub").textContent = `Status: ${status} • Storage: GCS`;
+
+    // Linked GitHub Issue
+    const ghBadge = document.getElementById("case-gh-badge");
+    const ghLink = document.getElementById("case-gh-link");
     if (c.github_issue_url) {
-      ghBanner.style.display = "block";
+      ghBadge.style.display = "block";
       ghLink.href = c.github_issue_url;
       ghLink.textContent = c.github_issue_url;
     } else {
-      ghBanner.style.display = "none";
+      ghBadge.style.display = "none";
     }
 
-    if (c.next_check) {
-      document.getElementById("next-check-text").textContent = c.next_check;
-    }
+    if (c.next_check) nextCheckLabel.textContent = c.next_check;
     if (c.handoff_notes) {
-      handoffBlock.textContent = c.handoff_notes;
+      handoffPreviewText.textContent = c.handoff_notes.slice(0, 220) + "…";
+      document.getElementById("modal-handoff-code").textContent = c.handoff_notes;
     }
 
-    // Hypotheses
+    // Render Facts & Hypotheses
     if (c.hypotheses && c.hypotheses.length) {
-      const hList = document.getElementById("hypotheses-list");
-      hList.innerHTML = "";
+      hypothesesUl.innerHTML = "";
       c.hypotheses.forEach(h => {
         const li = document.createElement("li");
         li.textContent = h;
-        hList.appendChild(li);
+        hypothesesUl.appendChild(li);
       });
     }
 
-    // Evidence rendering
-    if (c.evidence && c.evidence.length > 0) {
-      if (evidenceEmpty) evidenceEmpty.style.display = "none";
-      evidenceCount.textContent = `${c.evidence.length} items`;
-      evidenceFeed.innerHTML = "";
-      
-      const factsList = document.getElementById("facts-list");
-      factsList.innerHTML = "";
-
-      c.evidence.forEach(ev => {
-        const card = document.createElement("div");
-        card.className = "evidence-card";
-
-        if (isKnowledgeEvidence(ev)) {
-          const d = ev.data || ev.details || {};
-          const title = ev.title || d.title || "Troubleshooting Playbook";
-          const artId = ev.article_id || d.article_id || "KB-AUTH-101";
-          const summary = ev.summary || d.summary || ev.notes || "";
-          const category = ev.category || d.category || "Documentation Source";
-
-          card.innerHTML = `
-            <div class="evidence-header">
-              <span><span class="badge badge-kb">📖 KNOWLEDGE PLAYBOOK</span> <b style="margin-left:0.4rem; color:#fff;">${artId}</b></span>
-              <span class="badge badge-sim">SOURCE REFERENCE</span>
-            </div>
-            <div style="font-weight:600; font-size:0.86rem; color:#f1f5f9;">${title}</div>
-            <div class="evidence-meta-row">
-              <span class="evidence-meta-item">Category: <b>${category}</b></span>
-              <span class="evidence-meta-item">Type: <b>Internal Runbook</b></span>
-            </div>
-            <div class="evidence-meaning"><b>Policy guidance:</b> ${summary}</div>
-            <details class="tech-details">
-              <summary>View article details</summary>
-              <pre class="raw-json">${JSON.stringify(ev, null, 2)}</pre>
-            </details>
-          `;
-          evidenceFeed.appendChild(card);
-
-          const li = document.createElement("li");
-          li.textContent = `Consulted runbook ${artId} (${title})`;
-          factsList.appendChild(li);
-        } else {
-          // Diagnostic API test
-          const p = parseDiagnosticEvidence(ev);
-          const is200 = p.statusCode === 200;
-          const badgeCls = is200 ? 'badge-200' : 'badge-401';
-
-          card.innerHTML = `
-            <div class="evidence-header">
-              <span><span class="badge ${badgeCls}">HTTP ${p.statusCode} ${p.statusText}</span> <b style="margin-left:0.4rem; color:#fff;">${p.endpoint}</b></span>
-              <span class="badge badge-sim">SIMULATED DIAGNOSTIC</span>
-            </div>
-            <div class="evidence-meta-row">
-              <span class="evidence-meta-item">Token Used: <b style="color:var(--accent);">${p.tokenUsed}</b></span>
-              <span class="evidence-meta-item">Request ID: <b>${p.reqId}</b></span>
-              <span class="evidence-meta-item">Timestamp: <b>${new Date(p.timestamp).toLocaleTimeString()}</b></span>
-            </div>
-            <div class="evidence-meaning"><b>What this means:</b> ${p.meaning}</div>
-            <details class="tech-details">
-              <summary>View technical details (Full JSON payload)</summary>
-              <pre class="raw-json">${JSON.stringify(p.responseBody, null, 2)}</pre>
-            </details>
-          `;
-          evidenceFeed.appendChild(card);
-
-          const li = document.createElement("li");
-          li.textContent = `Endpoint ${p.endpoint} returned HTTP ${p.statusCode} with token ${p.tokenUsed}`;
-          factsList.appendChild(li);
-        }
-      });
-    } else {
-      if (evidenceEmpty) evidenceEmpty.style.display = "block";
-      evidenceCount.textContent = "0 items";
-      evidenceFeed.innerHTML = "";
-    }
+    // Render Timeline Items
+    renderTimeline(c.evidence || []);
   } catch (err) {
-    console.error("Error loading case", err);
+    console.error("Error loading case:", err);
   }
 }
 
-// GitHub Issue Modal Logic
-const modal = document.getElementById("issue-modal");
-const modalTitle = document.getElementById("modal-issue-title");
-const modalBody = document.getElementById("modal-issue-body");
-const modalMsg = document.getElementById("modal-status-msg");
+function renderTimeline(evidenceList) {
+  timelineFeed.innerHTML = "";
+  if (!evidenceList || evidenceList.length === 0) {
+    timelineFeed.appendChild(evidenceEmptyView);
+    document.getElementById("evidence-summary-count").textContent = "0 events recorded";
+    return;
+  }
 
-document.getElementById("btn-open-issue-modal").onclick = async () => {
-  modalMsg.style.display = "none";
-  try {
-    const res = await fetch(`/api/cases/${currentCaseId}/github_issue/preview`, { method: "POST" });
-    if (!res.ok) {
-      alert("Failed to load issue preview. Ensure the case is saved.");
-      return;
-    }
-    const data = await res.json();
-    modalTitle.value = data.title;
-    modalBody.value = data.body;
-    
-    if (data.already_created) {
-      modalMsg.style.display = "block";
-      modalMsg.textContent = `ℹ️ Issue already exists for this case: ${data.existing_url}`;
-      document.getElementById("btn-confirm-create-issue").disabled = true;
+  document.getElementById("evidence-summary-count").textContent = `${evidenceList.length} events logged`;
+  factsUl.innerHTML = "";
+
+  evidenceList.forEach((ev, idx) => {
+    const item = document.createElement("div");
+    item.className = "timeline-item";
+
+    const isKb = ev.type && (ev.type.includes("knowledge") || ev.type.includes("guide") || ev.article_id);
+    const statusCode = ev.status_code || (ev.data && ev.data.status_code) || (isKb ? null : 401);
+    const tokenUsed = ev.token_used || (ev.data && ev.data.token_used) || (ev.token || (statusCode === 200 ? "demo-valid-token" : "demo-expired-token"));
+    const endpoint = ev.endpoint || (ev.data && ev.data.endpoint) || "/v1/orders";
+    const reqId = ev.request_id || (ev.data && ev.data.request_id) || (ev.response_headers && ev.response_headers["x-request-id"]) || `req-sim-${statusCode}-${idx}`;
+    const timestamp = ev.timestamp || (ev.data && ev.data.timestamp) || new Date().toISOString();
+
+    let dotColor = "amber";
+    let titleStr = "";
+    let summaryStr = "";
+
+    if (isKb) {
+      dotColor = "purple";
+      const artId = ev.article_id || (ev.data && ev.data.article_id) || "KB-AUTH-101";
+      const artTitle = ev.title || (ev.data && ev.data.title) || "Runbook Policy";
+      titleStr = `📖 Runbook Guidance: ${artId} (${artTitle})`;
+      summaryStr = ev.summary || (ev.data && ev.data.summary) || "Active bearer tokens invalidated on credential modification.";
+      
+      const li = document.createElement("li");
+      li.textContent = `Retrieved runbook ${artId}: password modification invalidates active tokens.`;
+      factsUl.appendChild(li);
+    } else if (statusCode === 200) {
+      dotColor = "green";
+      titleStr = `HTTP 200 OK — Diagnostic Retry (${endpoint})`;
+      summaryStr = `Predefined test token '${tokenUsed}' succeeded. The endpoint and order scopes are operational.`;
+      
+      const li = document.createElement("li");
+      li.textContent = `Diagnostic retry with '${tokenUsed}' returned HTTP 200 OK (${reqId}).`;
+      factsUl.appendChild(li);
     } else {
-      document.getElementById("btn-confirm-create-issue").disabled = false;
+      dotColor = "red";
+      titleStr = `HTTP 401 Unauthorized — Initial Diagnostic (${endpoint})`;
+      summaryStr = `Predefined test token '${tokenUsed}' rejected with message: "Demo token rejected."`;
+      
+      const li = document.createElement("li");
+      li.textContent = `Initial diagnostic with '${tokenUsed}' failed with HTTP 401 Unauthorized (${reqId}).`;
+      factsUl.appendChild(li);
     }
-    modal.style.display = "flex";
+
+    item.innerHTML = `
+      <div class="timeline-marker">
+        <div class="marker-dot ${dotColor}"></div>
+        <div class="marker-line"></div>
+      </div>
+      <div class="timeline-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b style="font-size:0.85rem; color:#fff;">${titleStr}</b>
+          <span class="badge ${dotColor === 'green' ? 'badge-green' : (dotColor === 'red' ? 'badge-red' : 'badge-purple')}">${isKb ? 'RUNBOOK' : 'DIAGNOSTIC'}</span>
+        </div>
+        <div class="meta-tag-list">
+          ${isKb ? '' : `<span>Token: <b>${tokenUsed}</b></span>`}
+          ${isKb ? '' : `<span>Req ID: <b>${reqId}</b></span>`}
+          <span>Time: <b>${new Date(timestamp).toLocaleTimeString()}</b></span>
+        </div>
+        <div style="font-size:0.8rem; color:#cbd5e1; line-height:1.4;">${summaryStr}</div>
+        <details class="tech-expander">
+          <summary>View technical details</summary>
+          <pre class="code-json">${JSON.stringify(ev, null, 2)}</pre>
+        </details>
+      </div>
+    `;
+    timelineFeed.appendChild(item);
+  });
+}
+
+// Load All Saved Cases into Sidebar
+async function loadSavedCases() {
+  try {
+    const res = await fetch("/api/cases");
+    const data = await res.json();
+    allSavedCases = data.cases || [];
+    document.getElementById("saved-cases-count").textContent = allSavedCases.length;
+    renderDrawerCases(allSavedCases);
   } catch (e) {
-    alert("Error loading GitHub preview: " + e.message);
+    console.error("Failed to load cases", e);
+  }
+}
+
+function renderDrawerCases(list) {
+  const container = document.getElementById("drawer-cases-list");
+  container.innerHTML = "";
+  if (!list.length) {
+    container.innerHTML = '<div style="font-size:0.8rem; color:var(--text-muted);">No cases found.</div>';
+    return;
+  }
+  list.forEach(c => {
+    const div = document.createElement("div");
+    div.style.background = "var(--bg-card)";
+    div.style.border = "1px solid var(--border-subtle)";
+    div.style.borderRadius = "var(--radius-sm)";
+    div.style.padding = "0.75rem";
+    div.style.cursor = "pointer";
+    div.style.display = "flex";
+    div.style.flexDirection = "column";
+    div.style.gap = "0.3rem";
+    const isRes = c.status.toLowerCase() === 'resolved';
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b style="font-size:0.82rem; color:#fff;">${c.case_id}</b>
+        <span class="badge ${isRes ? 'badge-green' : 'badge-amber'}">${c.status}</span>
+      </div>
+      <div style="font-size:0.78rem; color:#cbd5e1;">${c.title || 'API Investigation'}</div>
+      <div style="font-size:0.72rem; color:var(--text-muted);">${c.github_issue_url ? '🐙 Issue linked' : 'Storage: GCS'}</div>
+    `;
+    div.onclick = () => {
+      loadCaseDetails(c.case_id);
+      document.getElementById("cases-drawer").classList.remove("open");
+    };
+    container.appendChild(div);
+  });
+}
+
+// Case search in drawer
+document.getElementById("case-search-box").addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase();
+  const filtered = allSavedCases.filter(c => 
+    c.case_id.toLowerCase().includes(q) || (c.title && c.title.toLowerCase().includes(q))
+  );
+  renderDrawerCases(filtered);
+});
+
+// GCS details modal
+document.getElementById("btn-gcs-details").onclick = async () => {
+  const res = await fetch("/api/storage/info");
+  const d = await res.json();
+  document.getElementById("gcs-modal-bucket").textContent = d.bucket;
+  document.getElementById("gcs-modal-proj").textContent = d.project;
+  document.getElementById("modal-gcs").style.display = "flex";
+};
+document.getElementById("btn-close-gcs-modal").onclick = () => {
+  document.getElementById("modal-gcs").style.display = "none";
+};
+
+// Drawer controls
+document.getElementById("btn-open-cases-drawer").onclick = () => {
+  document.getElementById("cases-drawer").classList.add("open");
+};
+document.getElementById("btn-close-drawer").onclick = () => {
+  document.getElementById("cases-drawer").classList.remove("open");
+};
+
+// New Investigation Case
+document.getElementById("btn-new-investigation").onclick = () => {
+  if (confirm("Start a clean investigation case? This will reset the board for a new issue.")) {
+    currentCaseId = "CASE-" + Date.now().toString().slice(-6);
+    document.getElementById("case-display-title").textContent = `${currentCaseId}: New API Investigation`;
+    document.getElementById("case-status-badge").textContent = "INVESTIGATING";
+    document.getElementById("case-status-badge").className = "badge badge-amber";
+    document.getElementById("case-gh-badge").style.display = "none";
+    renderTimeline([]);
+    factsUl.innerHTML = "<li>No facts recorded yet.</li>";
+    hypothesesUl.innerHTML = "<li>No hypotheses formulated yet.</li>";
+    nextCheckLabel.textContent = "Describe the observed API error to begin.";
+    handoffPreviewText.textContent = "Investigation not started.";
+    setStep(1);
+    appendMessage("agent", `New case initialized (${currentCaseId}). Describe the issue you are facing.`);
   }
 };
 
-document.getElementById("btn-close-modal").onclick = () => { modal.style.display = "none"; };
-document.getElementById("btn-cancel-modal").onclick = () => { modal.style.display = "none"; };
+// Full Handoff Modal
+document.getElementById("btn-preview-handoff").onclick = () => {
+  document.getElementById("modal-handoff").style.display = "flex";
+};
+document.getElementById("btn-close-handoff-modal").onclick = () => {
+  document.getElementById("modal-handoff").style.display = "none";
+};
+document.getElementById("btn-modal-copy").onclick = () => {
+  navigator.clipboard.writeText(document.getElementById("modal-handoff-code").textContent).then(() => {
+    const btn = document.getElementById("btn-modal-copy");
+    btn.textContent = "✓ Copied to clipboard!";
+    setTimeout(() => { btn.textContent = "📋 Copy Handoff"; }, 2000);
+  });
+};
+document.getElementById("btn-modal-resolve").onclick = async () => {
+  if (confirm("Confirm marking this investigation as RESOLVED?")) {
+    await sendChat("I confirm marking this investigation as RESOLVED based on verified evidence.");
+    document.getElementById("modal-handoff").style.display = "none";
+  }
+};
 
-document.getElementById("btn-confirm-create-issue").onclick = async () => {
-  const btn = document.getElementById("btn-confirm-create-issue");
+// GitHub Issue Modal
+document.getElementById("btn-create-gh-issue").onclick = async () => {
+  const msg = document.getElementById("issue-status-msg");
+  msg.style.display = "none";
+  try {
+    const res = await fetch(`/api/cases/${currentCaseId}/github_issue/preview`, { method: "POST" });
+    const data = await res.json();
+    document.getElementById("input-issue-title").value = data.title;
+    document.getElementById("input-issue-body").value = data.body;
+    document.getElementById("modal-issue").style.display = "flex";
+  } catch (e) {
+    alert("Could not load issue preview: " + e.message);
+  }
+};
+document.getElementById("btn-close-issue-modal").onclick = () => { document.getElementById("modal-issue").style.display = "none"; };
+document.getElementById("btn-cancel-issue").onclick = () => { document.getElementById("modal-issue").style.display = "none"; };
+
+document.getElementById("btn-confirm-submit-issue").onclick = async () => {
+  const btn = document.getElementById("btn-confirm-submit-issue");
+  const msg = document.getElementById("issue-status-msg");
   btn.disabled = true;
-  btn.textContent = "Creating issue…";
+  btn.textContent = "Submitting issue…";
 
   try {
     const res = await fetch(`/api/cases/${currentCaseId}/github_issue/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title: modalTitle.value,
-        body: modalBody.value
+        title: document.getElementById("input-issue-title").value,
+        body: document.getElementById("input-issue-body").value
       })
     });
-
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      modalMsg.style.display = "block";
-      modalMsg.textContent = "Notice: " + (data.error || "Failed to create issue.") + " " + (data.connection_step || "");
+    const d = await res.json();
+    if (d.success) {
+      msg.style.display = "block";
+      msg.style.color = "var(--status-green)";
+      msg.innerHTML = `✓ Created issue! <a href="${d.issue_url}" target="_blank" style="color:var(--accent-cyan); font-weight:700;">${d.issue_url}</a>`;
+      btn.textContent = "✓ Created!";
+      setTimeout(() => {
+        document.getElementById("modal-issue").style.display = "none";
+        loadCaseDetails(currentCaseId);
+      }, 1500);
+    } else {
+      msg.style.display = "block";
+      msg.style.color = "var(--status-amber)";
+      msg.textContent = d.error || "Issue creation failed.";
       btn.disabled = false;
       btn.textContent = "✓ Confirm & Create Issue";
-      return;
     }
-
-    modalMsg.style.display = "block";
-    modalMsg.style.color = "var(--success)";
-    modalMsg.innerHTML = `✓ Issue created! <a href="${data.issue_url}" target="_blank" style="color:#58a6ff;">${data.issue_url}</a>`;
-    btn.textContent = "✓ Created!";
-    
-    setTimeout(() => {
-      modal.style.display = "none";
-      loadBoardData();
-    }, 1500);
   } catch (err) {
-    modalMsg.style.display = "block";
-    modalMsg.textContent = "Network error: " + err.message;
+    msg.style.display = "block";
+    msg.style.color = "var(--status-red)";
+    msg.textContent = "Error: " + err.message;
     btn.disabled = false;
     btn.textContent = "✓ Confirm & Create Issue";
   }
 };
 
-async function loadInitialPreference() {
-  try {
-    const res = await fetch(`/api/preferences/${userId}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.detail_level) {
-        prefLabel.textContent = data.detail_level.charAt(0).toUpperCase() + data.detail_level.slice(1);
-      }
-    }
-  } catch (e) {}
-}
-
-updateWorkflowStep(1);
-loadInitialPreference();
-loadBoardData();
-sessionBadge.textContent = "Session: " + currentSessionId.slice(0, 8) + "…";
+// Initialization
+setStep(1);
+loadCaseDetails();
+loadSavedCases();
 </script>
 </body>
 </html>
